@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="referrer" content="no-referrer" />
+    <title>VisGroup25 - UP Master (User)</title>
+    <link href="css/bootstrap-combined.min.css" rel="stylesheet"/>
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/chart.js"></script>
+    <script src="js/global.js"></script>
+</head>
+<body>
+<div class="container-fluid">
+    <div class="row-fluid">
+        <div class="span12">
+            <div class="navbar">
+                <div class="navbar-inner">
+                    <div class="container-fluid">
+                        <a data-target=".navbar-responsive-collapse" data-toggle="collapse" class="btn btn-navbar"><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></a>
+                        <a href="#" class="brand">VisGroup25</a>
+                        <div class="nav-collapse collapse navbar-responsive-collapse">
+                            <ul class="nav">
+                                <li>
+                                    <a href="#">Home</a>
+                                </li>
+                                <li class="active">
+                                    <a href="#">User</a>
+                                </li>
+                                <li>
+                                    <a href="#">Link2</a>
+                                </li>
+                            </ul>
+                            <ul class="nav pull-right">
+                                <li>
+                                    <a href="#">Link3</a>
+                                </li>
+                                <li class="divider-vertical">
+                                </li>
+                                <li class="dropdown">
+                                    <a data-toggle="dropdown" class="dropdown-toggle" href="#">Menu<strong class="caret"></strong></a>
+                                    <ul class="dropdown-menu">
+                                        <li>
+                                            <a href="#">Nav1</a>
+                                        </li>
+                                        <li>
+                                            <a href="#">Nav2</a>
+                                        </li>
+                                        <li>
+                                            <a href="#">other</a>
+                                        </li>
+                                        <li class="divider">
+                                        </li>
+                                        <li class="nav-header">
+                                            label
+                                        </li>
+                                        <li>
+                                            <a href="#">Link1</a>
+                                        </li>
+                                        <li>
+                                            <a href="#">Link2</a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container-fluid">
+    <div class="row-fluid">
+        <div class="span4">
+            <dl class="dl-horizontal">
+                <dt>
+                    UP Name (ID)
+                </dt>
+                <dd id="up_name">
+                    ??? (?)
+                </dd>
+                <dt>
+                    Followers
+                </dt>
+                <dd id="up_follower">
+                    100
+                </dd>
+                <dt>
+                    Followings
+                </dt>
+                <dd id="up_following">
+                    10
+                </dd>
+                <dt>
+                    Tags
+                </dt>
+                <dd id="up_tags">
+                    (I have no tags.)
+                </dd>
+            </dl>
+        </div>
+        <div class="span4">
+            <img id="avatar" class="img-responsive img-rounded" alt="Avatar" width="200" height="200" />
+        </div>
+        <div class="span4">
+            <canvas id="videoTypeRound"></canvas>
+        </div>
+    </div>
+</div>
+</body>
+<script>
+    $(function () {
+        $.ajax({
+            url: "up_basic" + document.location.search,
+            type: "GET",
+            success: function (data) {
+                if (data.errcode === 0) {
+                    onUPBasicGot(data);
+                } else {
+                    alert("No such name or ID");
+                    window.close();
+                }
+            },
+            error:function(e) {
+                alert("network error");
+            }
+        });
+
+        window.chartColors = {
+            red: 'rgb(255, 99, 132)',
+            orange: 'rgb(255, 159, 64)',
+            yellow: 'rgb(255, 205, 86)',
+            green: 'rgb(75, 192, 192)',
+            blue: 'rgb(54, 162, 235)',
+            purple: 'rgb(153, 102, 255)',
+            grey: 'rgb(201, 203, 207)'
+        };
+
+        var data = {
+            datasets: [{
+                data: [10, 20, 30],
+                backgroundColor: [window.chartColors.red, window.chartColors.yellow, window.chartColors.green]
+            }],
+
+            // These labels appear in the legend and in the tooltips when hovering different arcs
+            labels: [
+                'Red',
+                'Yellow',
+                'Blue'
+            ]
+        };
+        var ctx = document.getElementById('videoTypeRound').getContext('2d');
+        var myDoughnutChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: data,
+            options: {
+
+            }
+        });
+    });
+
+    function onUPBasicGot(data) {
+        $("#avatar").attr("src", data.detailedUser.face);
+        $("#up_name").html(data.detailedUser.name + " (" + data.detailedUser.mid + ")");
+        $("#up_follower").html(Math.floor(data.detailedUser.follower / 1000) + "k");
+        $("#up_following").html(data.detailedUser.following);
+        var tags = data.detailedUser.tags;
+        if (tags !== undefined && tags !== null && tags.length > 0) {
+            var tagString = tags[0];
+            for (var i = 1; i < tags.length; i++) {
+                tagString += "; " + tags[i];
+            }
+            $("#up_tags").html(tagString);
+        }
+    }
+</script>
+</html>
