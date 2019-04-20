@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="referrer" content="no-referrer" />
+    <title>VisGroup25 - UP Master (User)</title>
+    <link href="css/bootstrap-combined.min.css" rel="stylesheet"/>
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/chart.js"></script>
+    <script src="js/global.js"></script>
+</head>
+<body>
+<div class="container-fluid">
+    <div class="row-fluid">
+        <div class="span12">
+            <div class="navbar">
+                <div class="navbar-inner">
+                    <div class="container-fluid">
+                        <a data-target=".navbar-responsive-collapse" data-toggle="collapse" class="btn btn-navbar"><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></a>
+                        <a href="#" class="brand">VisGroup25</a>
+                        <div class="nav-collapse collapse navbar-responsive-collapse">
+                            <ul class="nav">
+                                <li>
+                                    <a href="index.html">Home</a>
+                                </li>
+                                <li class="active">
+                                    <a href="up.html?name=LexBurner">User</a>
+                                </li>
+                                <li>
+                                    <a href="#">Compare</a>
+                                </li>
+                            </ul>
+                            <ul class="nav pull-right">
+                                <li>
+                                    <a href="#">Link3</a>
+                                </li>
+                                <li class="divider-vertical">
+                                </li>
+                                <li class="dropdown">
+                                    <a data-toggle="dropdown" class="dropdown-toggle" href="#">Menu<strong class="caret"></strong></a>
+                                    <ul class="dropdown-menu">
+                                        <li>
+                                            <a href="#">Nav1</a>
+                                        </li>
+                                        <li>
+                                            <a href="#">Nav2</a>
+                                        </li>
+                                        <li>
+                                            <a href="#">other</a>
+                                        </li>
+                                        <li class="divider">
+                                        </li>
+                                        <li class="nav-header">
+                                            label
+                                        </li>
+                                        <li>
+                                            <a href="#">Link1</a>
+                                        </li>
+                                        <li>
+                                            <a href="#">Link2</a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container-fluid">
+    <div class="row-fluid">
+        <div class="span4">
+            <dl class="dl-horizontal">
+                <dt>
+                    UP Name (ID)
+                </dt>
+                <dd id="up_name">
+                    ??? (?)
+                </dd>
+                <dt>
+                    Followers
+                </dt>
+                <dd id="up_follower">
+                    100
+                </dd>
+                <dt>
+                    Followings
+                </dt>
+                <dd id="up_following">
+                    10
+                </dd>
+                <dt>
+                    Tags
+                </dt>
+                <dd id="up_tags">
+                    (I have no tags.)
+                </dd>
+            </dl>
+        </div>
+        <div class="span4">
+            <img id="avatar" class="img-responsive img-rounded" alt="Avatar" width="200" height="200" />
+        </div>
+        <div class="span4">
+            <canvas id="video_type_round"></canvas>
+        </div>
+    </div>
+
+    <!--    footer-->
+    <div class="row-fluid">
+        <div class="span12">
+        </div>
+    </div>
+</div>
+</body>
+<script>
+    $(function () {
+        window.chartColors = {
+            red: 'rgb(255, 99, 132)',
+            green: 'rgb(75, 192, 192)',
+            orange: 'rgb(255, 159, 64)',
+            blue: 'rgb(54, 162, 235)',
+            yellow: 'rgb(255, 205, 86)',
+            purple: 'rgb(153, 102, 255)',
+            grey: 'rgb(201, 203, 207)',
+            array: [
+                'rgb(255, 99, 132)',
+                'rgb(75, 192, 192)',
+                'rgb(255, 159, 64)',
+                'rgb(54, 162, 235)',
+                'rgb(255, 205, 86)',
+                'rgb(153, 102, 255)',
+                'rgb(201, 203, 207)'
+            ],
+            array_17: [
+                'rgb(228, 26, 28)',
+                'rgb(55, 126, 184)',
+                'rgb(77, 175, 74)',
+                'rgb(152, 78, 163)',
+                'rgb(255, 127, 0)',
+                'rgb(255, 255, 51)',
+                'rgb(166, 86, 40)',
+                'rgb(247, 129, 191)',
+                'rgb(153, 153, 153)',
+                'rgb(102, 194, 165)',
+                'rgb(252, 141, 98)',
+                'rgb(141, 160, 203)',
+                'rgb(231, 138, 195)',
+                'rgb(166, 216, 84)',
+                'rgb(255, 217, 47)',
+                'rgb(229, 196, 148)',
+                'rgb(179, 179, 179)'
+            ]
+        };
+        $.ajax({
+            url: "up_basic" + document.location.search,
+            type: "GET",
+            success: function (data) {
+                if (data.errcode === 0) {
+                    onUPBasicGot(data);
+                } else {
+                    alert("No such name or ID");
+                }
+            },
+            error:function(e) {
+                alert("network error (up_basic)");
+            }
+        });
+        $.ajax({
+            url: "up_labor" + document.location.search,
+            type: "GET",
+            success: function (data) {
+                if (data.errcode === 0) {
+                    onUPLaborGot(data);
+                } else {
+                    alert("No such name or ID");
+                }
+            },
+            error:function(e) {
+                alert("network error (up_labor)");
+            }
+        });
+    });
+
+    function onUPBasicGot(data) {
+
+    }
+
+    function onUPLaborGot(data) {
+
+    }
+</script>
+</html>

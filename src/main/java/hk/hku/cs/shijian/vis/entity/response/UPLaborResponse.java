@@ -13,6 +13,8 @@ public class UPLaborResponse extends CommonResponse {
     private List<Integer> monthBinNum;
     private List<Double> monthBinMinute;
     private List<Double> monthBinHot;
+    private List<Double> monthBinView;
+    private List<Double> monthBinReply;
 
     public UPLaborResponse() {
         super();
@@ -60,5 +62,21 @@ public class UPLaborResponse extends CommonResponse {
 
     public void setMonthBins(List<Long> monthBins) {
         this.monthBins = monthBins;
+    }
+
+    public List<Double> getMonthBinView() {
+        return monthBinView;
+    }
+
+    public void setMonthBinView(List<Double> monthBinView) {
+        this.monthBinView = monthBinView;
+    }
+
+    public List<Double> getMonthBinReply() {
+        return monthBinReply;
+    }
+
+    public void setMonthBinReply(List<Double> monthBinReply) {
+        this.monthBinReply = monthBinReply;
     }
 }

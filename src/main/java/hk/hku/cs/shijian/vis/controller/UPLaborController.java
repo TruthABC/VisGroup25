@@ -76,6 +76,8 @@ public class UPLaborController {
         List<Integer> monthBinNum = new ArrayList<>();
         List<Double> monthBinMinute = new ArrayList<>();
         List<Double> monthBinHot = new ArrayList<>();
+        List<Double> monthBinView = new ArrayList<>();
+        List<Double> monthBinReply = new ArrayList<>();
 
         //make data for histogram
         UserVideoWithTag video0 = userVideos.get(0);
@@ -84,6 +86,8 @@ public class UPLaborController {
         monthBinNum.add(1);
         monthBinMinute.add(video0.getDuration() / 60.0);
         monthBinHot.add(video0.getFavorite()*0.6 + video0.getCoin()*0.3 + video0.getLike()*0.1);
+        monthBinView.add(video0.getView()+0.0);
+        monthBinReply.add(video0.getReply()+0.0);
         for (int i = 1; i < userVideos.size(); i++) {
             UserVideoWithTag video = userVideos.get(i);
             Date created = new Date(video.getCreated() * 1000);
@@ -95,11 +99,26 @@ public class UPLaborController {
                 monthBinNum.set(monthBinNum.size()-1, monthBinNum.get(monthBinNum.size()-1)+1);
                 monthBinMinute.set(monthBinMinute.size()-1, monthBinMinute.get(monthBinMinute.size()-1)+minute);
                 monthBinHot.set(monthBinHot.size()-1, monthBinHot.get(monthBinHot.size()-1)+hot);
+                monthBinView.set(monthBinView.size()-1, monthBinView.get(monthBinView.size()-1)+video.getView());
+                monthBinReply.set(monthBinReply.size()-1, monthBinReply.get(monthBinReply.size()-1)+video.getReply());
             } else {//if not same month
+                //while more than 1 month passed
+                //  (Dec -> Jan) or (m -> m+1)
+                while ((created.getYear() > lastCreated.getYear() && created.getMonth() - lastCreated.getMonth() != -11) || created.getMonth() - lastCreated.getMonth() > 1) {
+                    lastCreated.setMonth(lastCreated.getMonth() + 1);
+                    monthBins.add(lastCreated.getTime());
+                    monthBinNum.add(0);
+                    monthBinMinute.add(0.0);
+                    monthBinHot.add(0.0);
+                    monthBinView.add(0.0);
+                    monthBinReply.add(0.0);
+                }
                 monthBins.add(created.getTime());
                 monthBinNum.add(1);
                 monthBinMinute.add(minute);
                 monthBinHot.add(hot);
+                monthBinView.add(video.getView()+0.0);
+                monthBinReply.add(video.getReply()+0.0);
             }
             lastCreated = created;
         }
@@ -109,6 +128,8 @@ public class UPLaborController {
         res.setMonthBinNum(monthBinNum);
         res.setMonthBinMinute(monthBinMinute);
         res.setMonthBinHot(monthBinHot);
+        res.setMonthBinView(monthBinView);
+        res.setMonthBinReply(monthBinReply);
         return res;
     }
 }

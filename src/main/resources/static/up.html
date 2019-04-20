@@ -22,13 +22,13 @@
                         <div class="nav-collapse collapse navbar-responsive-collapse">
                             <ul class="nav">
                                 <li>
-                                    <a href="#">Home</a>
+                                    <a href="index.html">Home</a>
                                 </li>
                                 <li class="active">
                                     <a href="#">User</a>
                                 </li>
                                 <li>
-                                    <a href="#">Link2</a>
+                                    <a href="compare.html?name=LexBurner&name2=敖厂长">Compare</a>
                                 </li>
                             </ul>
                             <ul class="nav pull-right">
@@ -109,17 +109,78 @@
             <canvas id="video_type_round"></canvas>
         </div>
     </div>
+
+    <!--    compare me-->
     <div class="row-fluid">
-        <h3 contenteditable="false">How Active is the User:</h3>
+        <div class="span3">
+        </div>
+        <div class="span3">
+            <button class="btn btn-medium btn-block" type="button" onclick="compareMeClick()">Compare Me To:</button>
+        </div>
+        <div class="span3">
+            <input id="name2" class="input-medium search-query" type="text">
+        </div>
+        <div class="span3">
+        </div>
+    </div>
+
+<!--    draw 1-->
+    <div class="row-fluid">
         <div class="span12">
+            <h3 contenteditable="false">How Active is the User:</h3>
+            <div class="alert alert-info">
+                <button type="button" class="close" data-dismiss="alert">×</button>
+                <h4>
+                    Tips:
+                </h4>
+                <br/>
+                <p>Circle Size Shows the Hotness - "0.6 * Fav + 0.3 * Coin + 0.1 * Like".</p>
+                <p>Click on legends to filter in or filter out.</p>
+            </div>
             <canvas id="labor_bar_line"></canvas>
         </div>
+    </div>
+
+<!--    draw 2-->
+    <div class="row-fluid">
+        <div class="span12">
+            <h3 contenteditable="false">When User Release New Videos:</h3>
+            <div class="alert alert-info">
+                <button type="button" class="close" data-dismiss="alert">×</button>
+                <h4>
+                    Tips:
+                </h4>
+                <br/>
+                <p>Click on legends to filter in or filter out.</p>
+            </div>
+        </div>
+    </div>
+    <div class="row-fluid">
+        <div class="span6">
+            <canvas id="month_new"></canvas>
+        </div>
+        <div class="span6">
+            <canvas id="week_new"></canvas>
+        </div>
+    </div>
+    <div class="row-fluid">
         <div class="span12">
             <canvas id="labor_bubble"></canvas>
         </div>
     </div>
+
+<!--    draw 3-->
     <div class="row-fluid">
-        <h3 contenteditable="false">How Popular is the User:</h3>
+        <div class="span12">
+            <h3 contenteditable="false">How Popular is the User:</h3>
+            <canvas id="line_view_reply"></canvas>
+        </div>
+    </div>
+
+<!--    footer-->
+    <div class="row-fluid">
+        <div class="span12">
+        </div>
     </div>
 </div>
 </body>
@@ -142,14 +203,24 @@
                 'rgb(153, 102, 255)',
                 'rgb(201, 203, 207)'
             ],
-            array_a5: [
-                'rgb(255, 99, 132, 0.3)',
-                'rgb(75, 192, 192, 0.3)',
-                'rgb(255, 159, 64, 0.3)',
-                'rgb(54, 162, 235, 0.3)',
-                'rgb(255, 205, 86, 0.3)',
-                'rgb(153, 102, 255, 0.3)',
-                'rgb(201, 203, 207, 0.3)'
+            array_17: [
+                'rgb(228, 26, 28)',
+                'rgb(55, 126, 184)',
+                'rgb(77, 175, 74)',
+                'rgb(152, 78, 163)',
+                'rgb(255, 127, 0)',
+                'rgb(255, 255, 51)',
+                'rgb(166, 86, 40)',
+                'rgb(247, 129, 191)',
+                'rgb(153, 153, 153)',
+                'rgb(102, 194, 165)',
+                'rgb(252, 141, 98)',
+                'rgb(141, 160, 203)',
+                'rgb(231, 138, 195)',
+                'rgb(166, 216, 84)',
+                'rgb(255, 217, 47)',
+                'rgb(229, 196, 148)',
+                'rgb(179, 179, 179)'
             ]
         };
         $.ajax({
@@ -160,7 +231,6 @@
                     onUPBasicGot(data);
                 } else {
                     alert("No such name or ID");
-                    window.close();
                 }
             },
             error:function(e) {
@@ -175,7 +245,6 @@
                     onUPLaborGot(data);
                 } else {
                     alert("No such name or ID");
-                    window.close();
                 }
             },
             error:function(e) {
@@ -184,6 +253,10 @@
         });
         drawSample();
     });
+    /////////////////////////////////////////////////END OF ON DOCUMENT READY//////////////////////////////////////////
+    function compareMeClick() {
+        window.location.href = "compare.html"+ window.location.search +"&name2=" + $("#name2").val();
+    }
 
     function onUPBasicGot(data) {
         $("#avatar").attr("src", data.detailedUser.face);
@@ -203,6 +276,9 @@
     function onUPLaborGot(data) {
         drawLaborBarAndHotLine(data);
         drawLaborBubble(data);
+        drawMonthNew(data);
+        drawWeekNew(data);
+        drawPopular(data);
     }
 
     function drawSample() {
@@ -229,19 +305,20 @@
         });
     }//End drawSample()
 
+    //////////////////////////////////////////////HOT LINE//////////////////////////////////////////////////////////////
     function drawLaborBarAndHotLine(data) {
         var n = data.monthBins.length;
 
         //data ready
         var labelx= [];
         var minuteData = [];
-        var averageMinute = [];
+        // var averageMinute = [];
         for (var i = 0; i < n; i++) {
             var date = new Date();
             date.setTime(data.monthBins[i]);
             labelx.push(date.getFullYear() + "-" + (date.getMonth()+1));
             minuteData.push(Math.floor(data.monthBinMinute[i]));
-            averageMinute.push(Math.floor(data.monthBinMinute[i] / data.monthBinNum[i]));
+            // averageMinute.push(Math.floor(data.monthBinMinute[i] / data.monthBinNum[i]));
         }
 
         //draw
@@ -255,13 +332,14 @@
                         type: "line",
                         label: "Minutes",
                         data: minuteData,
+                        borderColor: window.chartColors.array[3],
                         yAxisID: "y-axis-1"
                     },
                     // {
                     //     type: "line",
                     //     label: "Average Minutes",
                     //     data: averageMinute,
-                    //     backgroundColor: window.chartColors.array_a5[0],
+                    //     backgroundColor: window.chartColors.array[0],
                     //     yAxisID: "y-axis-1"
                     // },
                     {
@@ -269,9 +347,7 @@
                         label: "Videos",
                         data: data.monthBinNum,
                         backgroundColor: window.chartColors.array[0],
-                        yAxisID: "y-axis-2"
-                        // borderColor: 'white',
-                        // borderWidth: 2,
+                        yAxisID: "y-axis-1"
                     }
                 ]
             },
@@ -290,15 +366,18 @@
                         type: "linear",
                         display: true,
                         beginAtZero: true,
+                        ticks: {
+                            min: 0
+                        },
                         position: "left",
                         id: 'y-axis-1'
                     },{
                         type: "linear",
-                        display: true,
+                        display: false,
                         beginAtZero: true,
-                        ticks: {
-                            max: 50
-                        },
+                        // ticks: {
+                        //     max: 50
+                        // },
                         position: "right",
                         id: "y-axis-2"
                     }]
@@ -307,45 +386,63 @@
                     position: "nearest",
                     mode: "index",
                     intersect: false
+                },
+                elements: {
+                    point: {
+                        radius: function (ctx) {
+                            var i = ctx.dataIndex;
+                            return Math.max(3, Math.min(30, data.monthBinHot[i] / 10000));
+                        },
+                        hoverRadius: function (ctx) {
+                            var i = ctx.dataIndex;
+                            return 3 + Math.max(3, Math.min(30, data.monthBinHot[i] / 10000));
+                        }
+                    }
                 }
             }
         });
     }
 
+    /////////////////////////////////////////////////Year Month Bubble//////////////////////////////////////////////////
     function drawLaborBubble(data) {
-        var n = data.monthBins.length;
+        //add all videos
         var bubbleData = [];
-        var minhot = data.monthBinHot[0];
-        var maxhot = data.monthBinHot[0];
-        for (var i = 1; i < n; i++) {
-            if (minhot > data.monthBinHot[i]) {
-                minhot = data.monthBinHot[i];
-            }
-            if (maxhot < data.monthBinHot[i]) {
-                maxhot = data.monthBinHot[i];
-            }
-        }
-        var labelx = [];
-        for (var i = 0; i < n; i++) {
+        var videoNum = data.userVideos.length;
+        var mI = 0;
+        for (var i = 0; i < videoNum; i++) {
             var date = new Date();
-            date.setTime(data.monthBins[i]);
-            labelx.push(date.getFullYear() + "-" + (date.getMonth()+1));
+            date.setTime(data.userVideos[i].created * 1000);
+            var mDate = new Date();
+            mDate.setTime(data.monthBins[mI]);
+            while (date.getFullYear() != mDate.getFullYear() || date.getMonth() != mDate.getMonth()) {
+                mI++;
+                mDate.setTime(data.monthBins[mI]);
+            }
             bubbleData.push({
-                x: i + 1,
-                y: Math.floor(data.monthBinMinute[i]),
-                r: Math.log(data.monthBinHot[i]),
-                monthBin: data.monthBins[i]
+                x: date.getFullYear(),
+                y: date.getMonth() + 1,
+                r: Math.min(data.monthBinNum[mI] * 5, 40)
             });
         }
+
+        //format bubbleData
         bubbleData = {
-            labels: labelx,
             datasets: [{
                 data: bubbleData,
                 // backgroundColor: window.chartColors.array[0],
                 // hoverBackgroundColor: window.chartColors.array[1],
-                label: data.userVideos[0].author
+                label: "Number of Videos as Size"
             }]
         };
+
+        //draw
+        var minYear = new Date();
+        minYear.setTime(data.monthBins[0]);
+        minYear = minYear.getFullYear();
+        var maxYear = new Date();
+        maxYear.setTime(data.monthBins[data.monthBins.length-1]);
+        maxYear = maxYear.getFullYear();
+
         var ctx = document.getElementById('labor_bubble').getContext('2d');
         var myBubbleChart = new Chart(ctx, {
             type: 'bubble',
@@ -354,21 +451,207 @@
                 responsive: true,
                 title: {
                     display: true,
-                    text: "How Active is " + data.userVideos[0].author
+                    text: "When " + data.userVideos[0].author + " release new Videos"
                 },
                 scales: {
                     xAxes : [{
-                        display: false,
-                        beginAtZero: true
+                        display: true,
+                        beginAtZero: false,
+                        ticks: {
+                            min: minYear-1,
+                            max: maxYear+1,
+                            stepSize: 1
+                        },
+                        scaleLabel: {
+                            display: true,
+                            labelString: "Year"
+                        }
                     }],
                     yAxes: [{
                         display: true,
-                        beginAtZero: true
+                        beginAtZero: true,
+                        ticks: {
+                            min: 0,
+                            max: 13,
+                            stepSize: 1
+                        },
+                        scaleLabel: {
+                            display: true,
+                            labelString: "Month"
+                        }
                     }]
                 },
                 tooltips: false
             }//End of options
         });
     }//End drawLaborBubble(data)
+
+    /////////////////////////////////////////////////POLAR Graph//////////////////////////////////////////////////
+    function drawMonthNew(data) {
+        //data prepare
+        var monthly = [
+            0,0,0,0,0,0,
+            0,0,0,0,0,0
+        ];
+        for (var i=0;i<data.userVideos.length;i++) {
+            var d = new Date(data.userVideos[i].created * 1000);
+            monthly[d.getMonth()]++;
+        }
+        //draw
+        var ctx = document.getElementById('month_new').getContext('2d');
+        var weekNew = Chart.PolarArea(ctx, {
+            data: {
+                datasets:[{
+                    data: monthly,
+                    backgroundColor: window.chartColors.array_17,
+                    label: "Monthly"
+                }],
+                labels: [
+                    "Jan.",
+                    "Feb.",
+                    "Mar.",
+                    "Apr.",
+                    "May.",
+                    "Jun.",
+                    "Jul.",
+                    "Aug.",
+                    "Sep.",
+                    "Oct.",
+                    "Nov.",
+                    "Dec."
+                ]
+            },
+            options: {
+                responsive: true,
+                legend: {
+                    position: "right"
+                },
+                title: {
+                    display: true,
+                    text: "Monthly new Video Distribution"
+                },
+                scale: {
+                    ticks: {
+                        beginAtZero: true
+                    },
+                    reverse: false
+                },
+                animation: {
+                    animateRotate: false,
+                    animateScale: true
+                }
+            }//END options
+        })//END Chart.PolarArea(xtc, {})
+    }
+
+    function drawWeekNew(data) {
+        //data prepare
+        var weekly = [0,0,0,0,0,0,0];
+        for (var i=0;i<data.userVideos.length;i++) {
+            var d = new Date(data.userVideos[i].created * 1000);
+            weekly[d.getDay()]++;
+        }
+        //draw
+        var ctx = document.getElementById('week_new').getContext('2d');
+        var weekNew = Chart.PolarArea(ctx, {
+            data: {
+                datasets:[{
+                    data: weekly,
+                    backgroundColor: window.chartColors.array,
+                    label: "Weekly"
+                }],
+                labels: [
+                    "Sun.",
+                    "Mon.",
+                    "Tue.",
+                    "Wed.",
+                    "Thu.",
+                    "Fri.",
+                    "Sat."
+                ]
+            },
+            options: {
+                responsive: true,
+                legend: {
+                    position: "right"
+                },
+                title: {
+                    display: true,
+                    text: "Weekly new Video Distribution"
+                },
+                scale: {
+                    ticks: {
+                        beginAtZero: true
+                    },
+                    reverse: false
+                },
+                animation: {
+                    animateRotate: false,
+                    animateScale: true
+                }
+            }//END options
+        })//END Chart.PolarArea(xtc, {})
+    }
+
+    function drawPopular(data) {
+        //prepare data
+        var labelx= [];
+        for (var i=0; i<data.monthBins.length; i++) {
+            var d = new Date(data.monthBins[i]);
+            labelx.push(d.getFullYear() + "-" + (d.getMonth()+1));
+        }
+        //draw
+        var ctx = document.getElementById('line_view_reply').getContext('2d');
+        var popularChart = Chart.Line(ctx, {
+            data:{
+                labels: labelx,
+                datasets: [{
+                    label: 'Views',
+                    borderColor: window.chartColors.green,
+                    backgroundColor: window.chartColors.green,
+                    fill: false,
+                    data: data.monthBinView,
+                    yAxisID: 'y-axis-1'
+                }, {
+                    label: 'Replies',
+                    borderColor: window.chartColors.blue,
+                    backgroundColor: window.chartColors.blue,
+                    fill: false,
+                    data: data.monthBinReply,
+                    yAxisID: 'y-axis-2'
+                }]
+            },
+            options: {
+                responsive: true,
+                hoverMode: 'index',
+                stacked: false,
+                title: {
+                    display: true,
+                    text: "How Popular is " + data.userVideos[0].author
+                },
+                scales: {
+                    yAxes: [{
+                        type: 'linear',
+                        display: true,
+                        position: 'left',
+                        id: 'y-axis-1'
+                    }, {
+                        type: 'linear',
+                        display: true,
+                        position: 'right',
+                        id: 'y-axis-2',
+                        gridLines: {
+                            drawOnChartArea: false // only want the grid lines for one axis to show up
+                        }
+                    }],
+                    tooltips: {
+                        position: "nearest",
+                        mode: "index",
+                        intersect: false
+                    }
+                }
+            }
+        });//END new Chart()
+    }//END function drawPopular(data)
 </script>
 </html>

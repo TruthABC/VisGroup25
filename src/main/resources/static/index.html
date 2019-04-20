@@ -25,10 +25,10 @@
                                     <a href="#">Home</a>
                                 </li>
                                 <li>
-                                    <a href="#">User</a>
+                                    <a href="up.html?name=LexBurner">User</a>
                                 </li>
                                 <li>
-                                    <a href="#">Link2</a>
+                                    <a href="compare.html?name=LexBurner&name2=敖厂长">Compare</a>
                                 </li>
                             </ul>
                             <ul class="nav pull-right">
@@ -64,19 +64,32 @@
                                 </li>
                             </ul>
                         </div>
-
                     </div>
                 </div>
-
+            </div>
+            <div class="hero-unit" contenteditable="false">
+                <h1>Visualization On Famous Bilibili UP Masters</h1>
+                <br/>
+                <p><a class="btn btn-primary btn-large" href="up.html?name=LexBurner">Quick Access »</a></p>
             </div>
             <div id="search_form" class="form-search">
+                <div class="alert alert-info">
+                    <button type="button" class="close" data-dismiss="alert">×</button>
+                    <h4>
+                        Tips:
+                    </h4>
+                    <br/>
+                    <p>1. Input a Name or ID and Click "Visualize" to  Visualize it.</p>
+                    <p>2. Click a List Item to Visualize it.</p>
+                </div>
                 <input id="search_input" class="input-medium search-query" type="text" />
-                <button id="search_up" onclick="onSubmit()" class="btn">User Details</button>
+                <button id="search_up" onclick="onSubmit()" class="btn">Visualize</button>
             </div>
             <table class="table table-striped table-hover" contenteditable="false">
                 <thead>
                 <tr>
-                    <th>UP Names</th>
+                    <th>UP Name</th>
+                    <th>UP ID</th>
                 </tr>
                 </thead>
                 <tbody id = "up_table">
@@ -93,14 +106,14 @@
 <script>
     var urlPrefix = getUrlPrefix(undefined);
     $(function () {
-
+        listAllUps();
     });
 
     //on click
     function onSubmit() {
         var name = $("#search_input").val();
         if (name === undefined || name === null || name === "") {
-            listAllUps();
+            // listAllUps();
             return;
         }
         jumpToUp(name);
@@ -131,7 +144,12 @@
         up_table.html("");
         for (var i = 0; i < data.detailedUserList.length; i++) {
             var name = data.detailedUserList[i].name;
-            up_table.append("<tr onclick=\"jumpToUp('" + name + "')\"><td>" + data.detailedUserList[i].name  + "</td></tr>");
+            up_table.append("<tr onclick=\"jumpToUp('" + name + "')\">" +
+                "<td>" +
+                "<img class='img-responsive img-circle' alt='Avatar' width='40' height='40' src='" + data.detailedUserList[i].face + "' />" +
+                data.detailedUserList[i].name  + "</td>" +
+                "<td>" + data.detailedUserList[i].mid  + "</td>" +
+                "</tr>");
         }
     }
 
