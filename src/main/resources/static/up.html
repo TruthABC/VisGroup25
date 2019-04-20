@@ -7,6 +7,7 @@
     <link href="css/bootstrap-combined.min.css" rel="stylesheet"/>
     <script src="js/jquery.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
     <script src="js/chart.js"></script>
     <script src="js/global.js"></script>
 </head>
@@ -106,13 +107,37 @@
             <img id="avatar" class="img-responsive img-rounded" alt="Avatar" width="200" height="200" />
         </div>
         <div class="span4">
-            <canvas id="videoTypeRound"></canvas>
+            <canvas id="video_type_round"></canvas>
+        </div>
+    </div>
+    <div class="row-fluid">
+        <h3 contenteditable="false">How Active is the User:</h3>
+        <div class="span12">
+            <canvas id="labor_bubble"></canvas>
         </div>
     </div>
 </div>
 </body>
 <script>
     $(function () {
+        window.chartColors = {
+            red: 'rgb(255, 99, 132)',
+            green: 'rgb(75, 192, 192)',
+            orange: 'rgb(255, 159, 64)',
+            blue: 'rgb(54, 162, 235)',
+            yellow: 'rgb(255, 205, 86)',
+            purple: 'rgb(153, 102, 255)',
+            grey: 'rgb(201, 203, 207)',
+            array: [
+                'rgb(255, 99, 132)',
+                'rgb(75, 192, 192)',
+                'rgb(255, 159, 64)',
+                'rgb(54, 162, 235)',
+                'rgb(255, 205, 86)',
+                'rgb(153, 102, 255)',
+                'rgb(201, 203, 207)'
+            ]
+        };
         $.ajax({
             url: "up_basic" + document.location.search,
             type: "GET",
@@ -125,41 +150,25 @@
                 }
             },
             error:function(e) {
-                alert("network error");
+                alert("network error (up_basic)");
             }
         });
-
-        window.chartColors = {
-            red: 'rgb(255, 99, 132)',
-            orange: 'rgb(255, 159, 64)',
-            yellow: 'rgb(255, 205, 86)',
-            green: 'rgb(75, 192, 192)',
-            blue: 'rgb(54, 162, 235)',
-            purple: 'rgb(153, 102, 255)',
-            grey: 'rgb(201, 203, 207)'
-        };
-
-        var data = {
-            datasets: [{
-                data: [10, 20, 30],
-                backgroundColor: [window.chartColors.red, window.chartColors.yellow, window.chartColors.green]
-            }],
-
-            // These labels appear in the legend and in the tooltips when hovering different arcs
-            labels: [
-                'Red',
-                'Yellow',
-                'Blue'
-            ]
-        };
-        var ctx = document.getElementById('videoTypeRound').getContext('2d');
-        var myDoughnutChart = new Chart(ctx, {
-            type: 'doughnut',
-            data: data,
-            options: {
-
+        $.ajax({
+            url: "up_labor" + document.location.search,
+            type: "GET",
+            success: function (data) {
+                if (data.errcode === 0) {
+                    onUPLaborGot(data);
+                } else {
+                    alert("No such name or ID");
+                    window.close();
+                }
+            },
+            error:function(e) {
+                alert("network error (up_labor)");
             }
         });
+        drawSample();
     });
 
     function onUPBasicGot(data) {
@@ -176,5 +185,126 @@
             $("#up_tags").html(tagString);
         }
     }
+
+    function onUPLaborGot(data) {
+        drawLaborBubble(data);
+    }
+
+    function drawSample() {
+        var data = {
+            datasets: [{
+                data: [10, 20, 30],
+                backgroundColor: window.chartColors.array
+            }],
+
+            // These labels appear in the legend and in the tooltips when hovering different arcs
+            labels: [
+                'Animation',
+                'Technology',
+                'Game'
+            ]
+        };
+        var ctx = document.getElementById('video_type_round').getContext('2d');
+        var myDoughnutChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: data,
+            options: {
+
+            }
+        });
+    }//End drawSample()
+
+    function drawLaborBubble(data) {
+        var n = data.monthBins.length;
+        var bubbleData = [];
+        var minhot = data.monthBinHot[0];
+        var maxhot = data.monthBinHot[0];
+        for (var i = 1; i < n; i++) {
+            if (minhot > data.monthBinHot[i]) {
+                minhot = data.monthBinHot[i];
+            }
+            if (maxhot < data.monthBinHot[i]) {
+                maxhot = data.monthBinHot[i];
+            }
+        }
+        var labelx = [];
+        for (var i = 0; i < n; i++) {
+            var date = new Date();
+            date.setTime(data.monthBins[i]);
+            labelx.push(date.getFullYear() + "-" + (date.getMonth()+1));
+            bubbleData.push({
+                x: i,
+                y: Math.floor(data.monthBinMinute[i]),
+                r: Math.log(data.monthBinHot[i]),
+                monthBin: data.monthBins[i]
+            });
+        }
+        bubbleData = {
+            labels: labelx,
+            datasets: [{
+                data: bubbleData,
+                // backgroundColor: window.chartColors.array[0],
+                // hoverBackgroundColor: window.chartColors.array[1],
+                label: data.userVideos[0].author
+            }]
+        };
+        var ctx = document.getElementById('labor_bubble').getContext('2d');
+        var myBubbleChart = new Chart(ctx, {
+            type: 'bubble',
+            data: bubbleData,
+            options: {
+                responsive: true,
+                title: {
+                    display: true,
+                    text: "How Active is " + data.userVideos[0].author
+                },
+                scales: {
+                    xAxes : [{
+                        display: true,
+                        ticks: {
+                            callback: function(dataLabel, index) {
+                                return dataLabel;
+                            }
+                        }
+                    }],
+                    yAxes: [{
+                        display: true,
+                        beginAtZero: false
+                    }]
+                }
+                // aspectRatio: 1,
+                // legend: false,
+                // tooltips: false,
+
+                // elements: {
+                //     point: {
+                        // backgroundColor: colorize.bind(null, false),
+
+                        // borderColor: colorize.bind(null, true),
+
+                        // borderWidth: function(context) {
+                        //     return Math.min(Math.max(1, context.datasetIndex + 1), 8);
+                        // },
+
+                        // hoverBackgroundColor: 'transparent',
+
+                        // hoverBorderColor: function(context) {
+                        //     return utils.color(context.datasetIndex);
+                        // },
+
+                        // hoverBorderWidth: function(context) {
+                        //     var value = context.dataset.data[context.dataIndex];
+                        //     return Math.round(8 * value.v / 1000);
+                        // },
+
+                        // radius: function(context) {
+                        //     var value = context.dataset.data[context.dataIndex].duration;
+                        //     return value;
+                        // }
+                    // }
+                // }
+            }//End of options
+        });
+    }//End drawLaborBubble(data)
 </script>
 </html>

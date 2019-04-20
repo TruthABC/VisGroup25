@@ -27,7 +27,7 @@ public class UPBasicController {
         String absoluteRootPath = request.getRealPath("/");
         absoluteRootPath += "WEB-INF/classes/static/data/";
 
-        //Set default "name"
+        //check null
         if (paramName == null || paramName.length() == 0) {
             return new CommonResponse(1, "Cannot find target of param 'name'");
         }
@@ -39,6 +39,7 @@ public class UPBasicController {
                 absoluteRootPath + USERS_FRIEND
         );
 
+        //check null
         int mid = 0;
         String name = null;
         if (GlobalDataOfUsers.gName2Mid.containsKey(paramName)) {

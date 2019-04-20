@@ -1,5 +1,7 @@
 package hk.hku.cs.shijian.vis.entity;
 
+import java.util.List;
+
 public class DetailedUser {
 
     //http://api.bilibili.com/x/space/acc/info?mid=777536
@@ -19,6 +21,9 @@ public class DetailedUser {
     //ret.data ->
     //private int mid;
     private String[] tags;
+
+    ////////////////////////////////////////////////////////////
+    private List<UserVideoWithTag> allVideos;
 
     ///////////////////////// EXTENDED /////////////////////////
     //private int submitVideo; //274
@@ -101,4 +106,11 @@ public class DetailedUser {
         this.tags = tags;
     }
 
+    public List<UserVideoWithTag> getAllVideos() {
+        return allVideos;
+    }
+
+    public void setAllVideos(List<UserVideoWithTag> allVideos) {
+        this.allVideos = allVideos;
+    }
 }

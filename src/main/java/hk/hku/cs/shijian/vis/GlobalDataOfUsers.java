@@ -8,13 +8,13 @@ import java.util.*;
 
 public class GlobalDataOfUsers {
 
-    public static Map<Integer, DetailedUser> gDetailedUsers;
+    public static Map<Integer, DetailedUser> gDetailedUsers;//mid -> value
     public static Map<String, Integer> gName2Mid;
     public static Map<Integer, RelationOfUser> gRelationsOfUsers;
 
     public static void loadUserDataToGlobalData(String pathDetail, String pathTags, String pathFollowings, String pathFriends) {
         // 0. only once init is needed
-        if (GlobalDataOfUsers.gDetailedUsers != null) {
+        if (gDetailedUsers != null) {
             return;
         }
         Map<Integer, DetailedUser> detailedUsers = new HashMap<>();
@@ -61,8 +61,8 @@ public class GlobalDataOfUsers {
             du.setTags(tags);
         }
 
-        GlobalDataOfUsers.gDetailedUsers = detailedUsers;
-        GlobalDataOfUsers.gName2Mid = name2Mid;
+        gDetailedUsers = detailedUsers;
+        gName2Mid = name2Mid;
         loadUserFollowingToGlobalData(pathFollowings, pathFriends);
     }
 
