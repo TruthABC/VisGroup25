@@ -7,7 +7,6 @@
     <link href="css/bootstrap-combined.min.css" rel="stylesheet"/>
     <script src="js/jquery.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
     <script src="js/chart.js"></script>
     <script src="js/global.js"></script>
 </head>
@@ -113,8 +112,14 @@
     <div class="row-fluid">
         <h3 contenteditable="false">How Active is the User:</h3>
         <div class="span12">
+            <canvas id="labor_bar_line"></canvas>
+        </div>
+        <div class="span12">
             <canvas id="labor_bubble"></canvas>
         </div>
+    </div>
+    <div class="row-fluid">
+        <h3 contenteditable="false">How Popular is the User:</h3>
     </div>
 </div>
 </body>
@@ -136,6 +141,15 @@
                 'rgb(255, 205, 86)',
                 'rgb(153, 102, 255)',
                 'rgb(201, 203, 207)'
+            ],
+            array_a5: [
+                'rgb(255, 99, 132, 0.3)',
+                'rgb(75, 192, 192, 0.3)',
+                'rgb(255, 159, 64, 0.3)',
+                'rgb(54, 162, 235, 0.3)',
+                'rgb(255, 205, 86, 0.3)',
+                'rgb(153, 102, 255, 0.3)',
+                'rgb(201, 203, 207, 0.3)'
             ]
         };
         $.ajax({
@@ -187,6 +201,7 @@
     }
 
     function onUPLaborGot(data) {
+        drawLaborBarAndHotLine(data);
         drawLaborBubble(data);
     }
 
@@ -214,6 +229,89 @@
         });
     }//End drawSample()
 
+    function drawLaborBarAndHotLine(data) {
+        var n = data.monthBins.length;
+
+        //data ready
+        var labelx= [];
+        var minuteData = [];
+        var averageMinute = [];
+        for (var i = 0; i < n; i++) {
+            var date = new Date();
+            date.setTime(data.monthBins[i]);
+            labelx.push(date.getFullYear() + "-" + (date.getMonth()+1));
+            minuteData.push(Math.floor(data.monthBinMinute[i]));
+            averageMinute.push(Math.floor(data.monthBinMinute[i] / data.monthBinNum[i]));
+        }
+
+        //draw
+        var ctx = document.getElementById('labor_bar_line').getContext('2d');
+        var myMixedChart = new Chart(ctx, {
+            type: "bar",
+            data: {
+                labels: labelx,
+                datasets: [
+                    {
+                        type: "line",
+                        label: "Minutes",
+                        data: minuteData,
+                        yAxisID: "y-axis-1"
+                    },
+                    // {
+                    //     type: "line",
+                    //     label: "Average Minutes",
+                    //     data: averageMinute,
+                    //     backgroundColor: window.chartColors.array_a5[0],
+                    //     yAxisID: "y-axis-1"
+                    // },
+                    {
+                        type: "bar",
+                        label: "Videos",
+                        data: data.monthBinNum,
+                        backgroundColor: window.chartColors.array[0],
+                        yAxisID: "y-axis-2"
+                        // borderColor: 'white',
+                        // borderWidth: 2,
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                title: {
+                    display: true,
+                    text: "How Active is " + data.userVideos[0].author
+                },
+                scales: {
+                    xAxes : [{
+                        display: true,
+                        beginAtZero: false
+                    }],
+                    yAxes: [{
+                        type: "linear",
+                        display: true,
+                        beginAtZero: true,
+                        position: "left",
+                        id: 'y-axis-1'
+                    },{
+                        type: "linear",
+                        display: true,
+                        beginAtZero: true,
+                        ticks: {
+                            max: 50
+                        },
+                        position: "right",
+                        id: "y-axis-2"
+                    }]
+                },
+                tooltips: {
+                    position: "nearest",
+                    mode: "index",
+                    intersect: false
+                }
+            }
+        });
+    }
+
     function drawLaborBubble(data) {
         var n = data.monthBins.length;
         var bubbleData = [];
@@ -233,7 +331,7 @@
             date.setTime(data.monthBins[i]);
             labelx.push(date.getFullYear() + "-" + (date.getMonth()+1));
             bubbleData.push({
-                x: i,
+                x: i + 1,
                 y: Math.floor(data.monthBinMinute[i]),
                 r: Math.log(data.monthBinHot[i]),
                 monthBin: data.monthBins[i]
@@ -260,49 +358,15 @@
                 },
                 scales: {
                     xAxes : [{
-                        display: true,
-                        ticks: {
-                            callback: function(dataLabel, index) {
-                                return dataLabel;
-                            }
-                        }
+                        display: false,
+                        beginAtZero: true
                     }],
                     yAxes: [{
                         display: true,
-                        beginAtZero: false
+                        beginAtZero: true
                     }]
-                }
-                // aspectRatio: 1,
-                // legend: false,
-                // tooltips: false,
-
-                // elements: {
-                //     point: {
-                        // backgroundColor: colorize.bind(null, false),
-
-                        // borderColor: colorize.bind(null, true),
-
-                        // borderWidth: function(context) {
-                        //     return Math.min(Math.max(1, context.datasetIndex + 1), 8);
-                        // },
-
-                        // hoverBackgroundColor: 'transparent',
-
-                        // hoverBorderColor: function(context) {
-                        //     return utils.color(context.datasetIndex);
-                        // },
-
-                        // hoverBorderWidth: function(context) {
-                        //     var value = context.dataset.data[context.dataIndex];
-                        //     return Math.round(8 * value.v / 1000);
-                        // },
-
-                        // radius: function(context) {
-                        //     var value = context.dataset.data[context.dataIndex].duration;
-                        //     return value;
-                        // }
-                    // }
-                // }
+                },
+                tooltips: false
             }//End of options
         });
     }//End drawLaborBubble(data)
