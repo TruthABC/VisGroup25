@@ -5,9 +5,11 @@
     <meta name="referrer" content="no-referrer" />
     <title>VisGroup25</title>
     <link href="css/bootstrap-combined.min.css" rel="stylesheet"/>
+    <link href="css/force-directed.css" rel="stylesheet"/>
     <script src="js/jquery.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
     <script src="js/chart.js"></script>
+    <script src="js/d3.v4.min.js"></script>
     <script src="js/global.js"></script>
 </head>
 <body>
@@ -38,8 +40,12 @@
             <div class="hero-unit" contenteditable="false">
                 <h1>Visualization On Famous Bilibili UP Masters</h1>
                 <br/>
+<!--            relations-->
+<!--                <img src="allUp.svg" onerror="this.src=''"/>-->
+                <svg width="840" height="420"></svg>
                 <p><a class="btn btn-primary btn-large" href="up.html?name=LexBurner">Quick Access »</a></p>
             </div>
+<!--            tips-->
             <div id="search_form" class="form-search">
                 <div class="alert alert-info">
                     <button type="button" class="close" data-dismiss="alert">×</button>
@@ -58,6 +64,7 @@
                 <tr>
                     <th>UP Name</th>
                     <th>UP ID</th>
+                    <th>UP followers</th>
                 </tr>
                 </thead>
                 <tbody id = "up_table">
@@ -72,6 +79,7 @@
 </div>
 </body>
 <script>
+    initGlobalColor();
     var urlPrefix = getUrlPrefix(undefined);
     $(function () {
         listAllUps();
@@ -107,18 +115,20 @@
 
     //ajax callback
     function onUPAllGot(data) {
-        console.log("totally " + data.detailedUserList.length + " UP Masters.");
+        console.log("totally " + data.simplifiedUserList.length + " UP Masters.");
         var up_table = $("#up_table");
         up_table.html("");
-        for (var i = 0; i < data.detailedUserList.length; i++) {
-            var name = data.detailedUserList[i].name;
+        for (var i = 0; i < data.simplifiedUserList.length; i++) {
+            var name = data.simplifiedUserList[i].name;
             up_table.append("<tr onclick=\"jumpToUp('" + name + "')\">" +
                 "<td>" +
-                "<img class='img-responsive img-circle' alt='Avatar' width='40' height='40' src='" + data.detailedUserList[i].face + "' />" +
-                data.detailedUserList[i].name  + "</td>" +
-                "<td>" + data.detailedUserList[i].mid  + "</td>" +
+                "<img class='img-responsive img-circle' alt='Avatar' width='40' height='40' src='" + data.simplifiedUserList[i].face + "' />" +
+                data.simplifiedUserList[i].name  + "</td>" +
+                "<td>" + data.simplifiedUserList[i].mid  + "</td>" +
+                "<td>" + Math.floor(data.simplifiedUserList[i].follower / 1000)  + "k</td>" +
                 "</tr>");
         }
+        drawForce(data);
     }
 
     //jump tp the page of exact UP
@@ -126,5 +136,128 @@
         urlPrefix = getUrlPrefix(urlPrefix);
         window.open(urlPrefix + "/up.html?name=" + name);
     }
+    ///////////////////////////////////////////////////////D3 Force Direct//////////////////////////////////////////////
+    function drawForce(data) {
+        var users = data.simplifiedUserList;
+        var relationsOfUser = data.relationOfUserList;
+        var graph = {
+            nodes: [],
+            links: []
+        };
+
+        //fill fDate
+        for (var i = 0; i < users.length; i++) {
+            graph.nodes.push({
+                id: users[i].name,
+                size: users[i].follower
+            });
+        }
+        for (var i = 0; i < relationsOfUser.length; i++) {
+            var followings = relationsOfUser[i].followings;
+            for (var j = 0; j < followings.length; j++) {
+                graph.links.push({
+                    source: relationsOfUser[i].name,
+                    target: followings[j].name,
+                    value: 5
+                });
+            }
+        }
+
+        //draw force-directed
+        var svg = d3.select("svg"),
+            width = +svg.attr("width"),
+            height = +svg.attr("height");
+
+        var color = d3.scaleOrdinal(d3.schemeCategory20);
+
+        svg.append("svg:defs").selectAll("marker")
+            .data(["end"])      // Different link/path types can be defined here
+            .enter().append("svg:marker")    // This section adds in the arrows
+            .attr("id", String)
+            .attr("viewBox", "0 -5 10 10")
+            .attr("refX", 15)
+            .attr("refY", -1.5)
+            .attr("markerWidth", 6)
+            .attr("markerHeight", 6)
+            .attr("orient", "auto")
+            .append("svg:path")
+            .attr("d", "M0,-5L10,0L0,5");
+
+        var simulation = d3.forceSimulation()
+            .force("link", d3.forceLink().distance(200).id(function(d) { return d.id; }))
+            .force("charge", d3.forceManyBody())
+            .force("center", d3.forceCenter(width / 2, height / 2));
+
+        var link = svg.append("g")
+            .attr("class", "links")
+            .selectAll("line")
+            .data(graph.links)
+            .enter().append("line")
+            .attr("stroke-width", function(d) { return Math.sqrt(d.value); })
+            .attr("marker-end", "url(#end)")
+            .style("stroke-width", function(d) { return 1; });
+
+        var node = svg.append("g")
+            .attr("class", "nodes")
+            .selectAll("g")
+            .data(graph.nodes)
+            .enter().append("g");
+
+        var circles = node.append("circle")
+            .attr("fill", function(d) { var color = "rgba(" + Math.min(255,(100 + Math.floor(d.size/500/1000)*20)) + ", 99, 132, 0.8)"; return color; })
+            .attr("r", function(d) { return Math.max(d.size / 1000 / 1000 * 5, 7); })
+            .call(d3.drag()
+                .on("start", dragstarted)
+                .on("drag", dragged)
+                .on("end", dragended));
+
+        var lables = node.append("text")
+            .text(function(d) {
+                return d.id;
+            })
+            .attr('x', 6)
+            .attr('y', 3);
+
+        node.append("title")
+            .text(function(d) { return d.id; });
+
+        simulation
+            .nodes(graph.nodes)
+            .on("tick", ticked);
+
+        simulation.force("link")
+            .links(graph.links);
+
+        function ticked() {
+            link
+                .attr("x1", function(d) { return d.source.x; })
+                .attr("y1", function(d) { return d.source.y; })
+                .attr("x2", function(d) { return d.target.x; })
+                .attr("y2", function(d) { return d.target.y; });
+
+            node
+                .attr("transform", function(d) {
+                    return "translate(" + d.x + "," + d.y + ")";
+                })
+        }
+
+        function dragstarted(d) {
+            if (!d3.event.active) simulation.alphaTarget(0.3).restart();
+            d.fx = d.x;
+            d.fy = d.y;
+        }
+
+        function dragged(d) {
+            d.fx = d3.event.x;
+            d.fy = d3.event.y;
+        }
+
+        function dragended(d) {
+            if (!d3.event.active) simulation.alphaTarget(0);
+            d.fx = null;
+            d.fy = null;
+        }
+    }
+    ///////////////////////////////////////////////////////D3 Force Direct//////////////////////////////////////////////
 </script>
 </html>

@@ -1,31 +1,31 @@
 package hk.hku.cs.shijian.vis.entity.response;
 
-import hk.hku.cs.shijian.vis.entity.DetailedUser;
+import hk.hku.cs.shijian.vis.entity.SimplifiedUser;
 import hk.hku.cs.shijian.vis.entity.RelationOfUser;
 
 import java.util.List;
 
 public class UPAllResponse extends CommonResponse {
 
-    private List<DetailedUser> detailedUserList;
+    private List<SimplifiedUser> simplifiedUserList;
     private List<RelationOfUser> relationOfUserList;
 
     public UPAllResponse() {
         super();
     }
 
-    public UPAllResponse(int errcode, String errmsg, List<DetailedUser> detailedUserList, List<RelationOfUser> relationOfUserList) {
+    public UPAllResponse(int errcode, String errmsg, List<SimplifiedUser> detailedUserList, List<RelationOfUser> relationOfUserList) {
         super(errcode, errmsg);
-        this.detailedUserList = detailedUserList;
+        this.simplifiedUserList = detailedUserList;
         this.relationOfUserList = relationOfUserList;
     }
 
-    public List<DetailedUser> getDetailedUserList() {
-        return detailedUserList;
+    public List<SimplifiedUser> getSimplifiedUserList() {
+        return simplifiedUserList;
     }
 
-    public void setDetailedUserList(List<DetailedUser> detailedUserList) {
-        this.detailedUserList = detailedUserList;
+    public void setSimplifiedUserList(List<SimplifiedUser> detailedUserList) {
+        this.simplifiedUserList = detailedUserList;
     }
 
     public List<RelationOfUser> getRelationOfUserList() {
