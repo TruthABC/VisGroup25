@@ -17,6 +17,14 @@ public class UPLaborResponse extends CommonResponse {
     private List<Double> monthBinView;
     private List<Double> monthBinReply;
 
+    ///////////////////////// for name1 EXTENDED_20190421 //////////////////
+    private List<String> videoTypes;
+    private List<Integer> videoTypeNums;
+
+    private List<String> videoTags;
+    private List<Integer> videoTagNums;
+    ///////////////////////// for name1 EXTENDED_20190421 //////////////////
+
     //for name2
     private List<UserVideoWithTag> userVideos2;
     private List<Integer> monthBinNum2;
@@ -128,5 +136,37 @@ public class UPLaborResponse extends CommonResponse {
 
     public void setUserStat2(UserStat userStat2) {
         this.userStat2 = userStat2;
+    }
+
+    public List<String> getVideoTypes() {
+        return videoTypes;
+    }
+
+    public void setVideoTypes(List<String> videoTypes) {
+        this.videoTypes = videoTypes;
+    }
+
+    public List<Integer> getVideoTypeNums() {
+        return videoTypeNums;
+    }
+
+    public void setVideoTypeNums(List<Integer> videoTypeNums) {
+        this.videoTypeNums = videoTypeNums;
+    }
+
+    public List<String> getVideoTags() {
+        return videoTags;
+    }
+
+    public void setVideoTags(List<String> videoTags) {
+        this.videoTags = videoTags;
+    }
+
+    public List<Integer> getVideoTagNums() {
+        return videoTagNums;
+    }
+
+    public void setVideoTagNums(List<Integer> videoTagNums) {
+        this.videoTagNums = videoTagNums;
     }
 }

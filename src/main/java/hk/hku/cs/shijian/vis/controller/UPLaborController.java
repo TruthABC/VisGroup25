@@ -3,6 +3,7 @@ package hk.hku.cs.shijian.vis.controller;
 import hk.hku.cs.shijian.vis.GlobalDataOfUsers;
 import hk.hku.cs.shijian.vis.GlobalDataOfVideos;
 import hk.hku.cs.shijian.vis.entity.UserVideoWithTag;
+import hk.hku.cs.shijian.vis.entity.VideoTag;
 import hk.hku.cs.shijian.vis.entity.response.CommonResponse;
 import hk.hku.cs.shijian.vis.entity.response.UPLaborResponse;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -165,8 +166,42 @@ public class UPLaborController {
         res.setMonthBinHot(monthBinHot);
         res.setMonthBinView(monthBinView);
         res.setMonthBinReply(monthBinReply);
+
+        //For type and tag
+        res.setVideoTypes(new ArrayList<>());
+        res.setVideoTypeNums(new ArrayList<>());
+        res.setVideoTags(new ArrayList<>());
+        res.setVideoTagNums(new ArrayList<>());
+
+        fillUPTypeAndTag(userVideos, res.getVideoTypes(), res.getVideoTypeNums(), res.getVideoTags(), res.getVideoTagNums());
+
         return res;
     }
+
+    private void fillUPTypeAndTag(List<UserVideoWithTag> userVideos, List<String> videoTypes, List<Integer> videoTypeNums, List<String> videoTags, List<Integer> videoTagNums) {
+        for (UserVideoWithTag uvt: userVideos) {
+            {
+                String type = uvt.getTname();
+                int index = videoTypes.indexOf(type);
+                if (index == -1) {
+                    videoTypes.add(type);
+                    videoTypeNums.add(1);
+                } else {
+                    videoTypeNums.set(index, videoTypeNums.get(index) + 1);
+                }
+            }
+            for (VideoTag vt: uvt.getTags()) {
+                String tag = vt.getTag_name();
+                int index = videoTags.indexOf(tag);
+                if (index == -1) {
+                    videoTags.add(tag);
+                    videoTagNums.add(1);
+                } else {
+                    videoTagNums.set(index, videoTagNums.get(index) + 1);
+                }
+            }
+        }//END for (UserVideoWithTag uvt: userVideos)
+    }//END private void fillUPTypeAndTag
 
     private UPLaborResponse fillUPLaborResponseFor1_2(List<UserVideoWithTag> userVideos1, List<UserVideoWithTag> userVideos2, List<UserVideoWithTag> userVideos1_2) {
         UPLaborResponse res = new UPLaborResponse(0, "OK");

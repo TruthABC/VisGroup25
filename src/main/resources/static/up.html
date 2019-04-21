@@ -197,6 +197,23 @@
                 'rgb(166, 216, 84)',
                 'rgb(255, 217, 47)',
                 'rgb(229, 196, 148)',
+                'rgb(179, 179, 179)',
+                'rgb(228, 26, 28)',
+                'rgb(55, 126, 184)',
+                'rgb(77, 175, 74)',
+                'rgb(152, 78, 163)',
+                'rgb(255, 127, 0)',
+                'rgb(255, 255, 51)',
+                'rgb(166, 86, 40)',
+                'rgb(247, 129, 191)',
+                'rgb(153, 153, 153)',
+                'rgb(102, 194, 165)',
+                'rgb(252, 141, 98)',
+                'rgb(141, 160, 203)',
+                'rgb(231, 138, 195)',
+                'rgb(166, 216, 84)',
+                'rgb(255, 217, 47)',
+                'rgb(229, 196, 148)',
                 'rgb(179, 179, 179)'
             ]
         };
@@ -228,7 +245,6 @@
                 alert("network error (up_labor)");
             }
         });
-        drawSample();
     });
     /////////////////////////////////////////////////END OF ON DOCUMENT READY//////////////////////////////////////////
     function compareMeClick() {
@@ -256,26 +272,22 @@
         drawMonthNew(data);
         drawWeekNew(data);
         drawPopular(data);
+        drawType(data);
     }
 
-    function drawSample() {
-        var data = {
-            datasets: [{
-                data: [10, 20, 30],
-                backgroundColor: window.chartColors.array
-            }],
-
-            // These labels appear in the legend and in the tooltips when hovering different arcs
-            labels: [
-                'Animation',
-                'Technology',
-                'Game'
-            ]
-        };
+    function drawType(data) {
         var ctx = document.getElementById('video_type_round').getContext('2d');
         var myDoughnutChart = new Chart(ctx, {
             type: 'doughnut',
-            data: data,
+            data: {
+                datasets: [{
+                    data: data.videoTypeNums,
+                    backgroundColor: window.chartColors.array_17
+                }],
+
+                // These labels appear in the legend and in the tooltips when hovering different arcs
+                labels: data.videoTypes
+            },
             options: {
 
             }
