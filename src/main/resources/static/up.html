@@ -80,6 +80,9 @@
 
     <!--    compare me-->
     <div class="row-fluid">
+        <br/>
+    </div>
+    <div class="row-fluid">
         <div class="span3">
         </div>
         <div class="span3">
@@ -90,6 +93,55 @@
         </div>
         <div class="span3">
         </div>
+    </div>
+<!--    draw 1-->
+    <div class="row-fluid">
+        <h3 contenteditable="false">Relation of User:</h3>
+        <div class="accordion" id="accordion-660327">
+            <div class="accordion-group">
+                <div class="accordion-heading"><a class="accordion-toggle" contenteditable="false" data-parent="#accordion-660327" data-toggle="collapse" href="#accordion-element-81462">Followers</a></div>
+                <div class="accordion-body collapse" id="accordion-element-81462" style="height: 0px;">
+                    <div class="accordion-inner" contenteditable="false">
+                        <table class="table table-striped table-hover" contenteditable="false">
+                            <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>UP Name</th>
+                                <th>UP ID</th>
+                            </tr>
+                            </thead>
+                            <tbody id = "up_followers">
+                            <!--                <tr>-->
+                            <!--                    <td>Mr.Truth</td>-->
+                            <!--                </tr>-->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-group">
+                <div class="accordion-heading"><a class="accordion-toggle" contenteditable="false" data-parent="#accordion-660327" data-toggle="collapse" href="#accordion-element-64142">Followings</a></div>
+                <div class="accordion-body collapse" id="accordion-element-64142" style="height: 0px;">
+                    <div class="accordion-inner" contenteditable="false">
+                        <table class="table table-striped table-hover" contenteditable="false">
+                            <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>UP Name</th>
+                                <th>UP ID</th>
+                            </tr>
+                            </thead>
+                            <tbody id = "up_followings">
+                            <!--                <tr>-->
+                            <!--                    <td>Mr.Truth</td>-->
+                            <!--                </tr>-->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 
 <!--    draw 1-->
@@ -251,6 +303,12 @@
         window.location.href = "compare.html"+ window.location.search +"&name2=" + $("#name2").val();
     }
 
+    //jump tp the page of exact UP
+    function jumpToUp(name) {
+        var urlPrefix = getUrlPrefix(urlPrefix);
+        window.open(urlPrefix + "/up.html?name=" + name);
+    }
+
     function onUPBasicGot(data) {
         $("#avatar").attr("src", data.detailedUser.face);
         $("#up_name").html(data.detailedUser.name + " (" + data.detailedUser.mid + ")");
@@ -263,6 +321,34 @@
                 tagString += "; " + tags[i];
             }
             $("#up_tags").html(tagString);
+        }
+
+        //relations
+        var up_foer = $("#up_followers");
+        var up_foing = $("#up_followings");
+        up_foer.html();
+        up_foing.html();
+
+        for (var i = 0; i < data.relationOfUser.followers.length; i++) {
+            var name = data.relationOfUser.followers[i].name;
+            up_foer.append("<tr onclick=\"jumpToUp('" + name + "')\">" +
+                "<td>" + (i+1)  + "</td>" +
+                "<td>" +
+                "<img class='img-responsive img-circle' alt='Avatar' width='40' height='40' src='" + data.relationOfUser.followers[i].face + "' />" +
+                data.relationOfUser.followers[i].name  + "</td>" +
+                "<td>" + data.relationOfUser.followers[i].mid  + "</td>" +
+                "</tr>");
+        }
+
+        for (var i = 0; i < data.relationOfUser.followings.length; i++) {
+            var name = data.relationOfUser.followings[i].name;
+            up_foing.append("<tr onclick=\"jumpToUp('" + name + "')\">" +
+                "<td>" + (i+1)  + "</td>" +
+                "<td>" +
+                "<img class='img-responsive img-circle' alt='Avatar' width='40' height='40' src='" + data.relationOfUser.followings[i].face + "' />" +
+                data.relationOfUser.followings[i].name  + "</td>" +
+                "<td>" + data.relationOfUser.followings[i].mid  + "</td>" +
+                "</tr>");
         }
     }
 

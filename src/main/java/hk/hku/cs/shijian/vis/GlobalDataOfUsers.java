@@ -90,26 +90,26 @@ public class GlobalDataOfUsers {
             // add following
             if (relationsOfUsers.containsKey(mid1)) {
                 RelationOfUser rou = relationsOfUsers.get(mid1);
-                rou.getFollowings().add(new SimplifiedUser(mid2, name2));
+                rou.getFollowings().add(new SimplifiedUser(mid2, name2, gDetailedUsers.get(mid2).getFace()));
             } else {
                 RelationOfUser rou = new RelationOfUser(mid1, name1);
                 rou.setFollowings(new ArrayList<>());
                 rou.setFollowers(new ArrayList<>());
                 rou.setFriends(new ArrayList<>());
-                rou.getFollowings().add(new SimplifiedUser(mid2, name2));
+                rou.getFollowings().add(new SimplifiedUser(mid2, name2, gDetailedUsers.get(mid2).getFace()));
                 relationsOfUsers.put(mid1, rou);
             }
 
             // add follower
             if (relationsOfUsers.containsKey(mid2)) {
                 RelationOfUser rou = relationsOfUsers.get(mid2);
-                rou.getFollowers().add(new SimplifiedUser(mid1, name1));
+                rou.getFollowers().add(new SimplifiedUser(mid1, name1, gDetailedUsers.get(mid1).getFace()));
             } else {
                 RelationOfUser rou = new RelationOfUser(mid2, name2);
                 rou.setFollowings(new ArrayList<>());
                 rou.setFollowers(new ArrayList<>());
                 rou.setFriends(new ArrayList<>());
-                rou.getFollowers().add(new SimplifiedUser(mid1, name1));
+                rou.getFollowers().add(new SimplifiedUser(mid1, name1, gDetailedUsers.get(mid1).getFace()));
                 relationsOfUsers.put(mid2, rou);
             }
         }
@@ -128,7 +128,7 @@ public class GlobalDataOfUsers {
             int mid1 = gName2Mid.get(parts[0]);
             int mid2 = gName2Mid.get(parts[1]);
             RelationOfUser rou = relationsOfUsers.get(mid1);
-            rou.getFriends().add(new SimplifiedUser(mid2, name2));
+            rou.getFriends().add(new SimplifiedUser(mid2, name2, gDetailedUsers.get(mid2).getFace()));
         }
         scanner.close();
 

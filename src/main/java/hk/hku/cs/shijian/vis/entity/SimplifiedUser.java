@@ -11,9 +11,10 @@ public class SimplifiedUser {
 
     public SimplifiedUser() {}
 
-    public SimplifiedUser(int mid, String name) {
+    public SimplifiedUser(int mid, String name, String face) {
         this.mid = mid;
         this.name = name;
+        this.face = face;
     }
 
     public SimplifiedUser(int mid, String name, String face, int following, int follower) {
