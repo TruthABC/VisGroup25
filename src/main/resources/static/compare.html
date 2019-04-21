@@ -190,10 +190,10 @@
 
     function onUPLaborGot(data) {
         drawLaborBarAndHotLine(data);
+        drawCompareStat(data);
     }
 
     //////////////////////////////////////////DRAW line bar/////////////////////////////////////////////////////////////
-    //////////////////////////////////////////////HOT LINE//////////////////////////////////////////////////////////////
     function drawLaborBarAndHotLine(data) {
         //data ready
         var labelx= [];
@@ -284,6 +284,82 @@
                     position: "nearest",
                     mode: "index",
                     intersect: false
+                }
+            }
+        });
+    }//END OF function drawLaborBarAndHotLine(data)
+
+    //////////////////////////////////////////DRAW compare stat/////////////////////////////////////////////////////////
+    function drawCompareStat(data) {
+        var ctx = document.getElementById('compare_stat').getContext('2d');
+        var myCompareStat = new Chart(ctx, {
+            type: "horizontalBar",
+            data: {
+                labels: [
+                    // "Video",
+                    // "Minute",
+                    "Follower",
+                    "Danmaku",
+                    "Reply",
+                    "Favorite",
+                    "Coin",
+                    "Like",
+                    // "View"
+                ],
+                datasets: [{
+                    label: data.userStat.name,
+                    backgroundColor: window.chartColors.array_a[3],
+                    borderColor: window.chartColors.array[3],
+                    borderWidth: 1,
+                    data: [
+                        // data.userStat.video,
+                        // data.userStat.minute,
+                        data.userStat.follower,
+                        data.userStat.danmaku,
+                        data.userStat.reply,
+                        data.userStat.fav,
+                        data.userStat.coin,
+                        data.userStat.like,
+                        // data.userStat.view
+                    ]
+                },{
+                    label: data.userStat2.name,
+                    backgroundColor: window.chartColors.array_a[0],
+                    borderColor: window.chartColors.array[0],
+                    borderWidth: 1,
+                    data: [
+                        // data.userStat2.video,
+                        // data.userStat2.minute,
+                        data.userStat2.follower,
+                        data.userStat2.danmaku,
+                        data.userStat2.reply,
+                        data.userStat2.fav,
+                        data.userStat2.coin,
+                        data.userStat2.like,
+                        // data.userStat2.view
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                legend: {
+                    position: "right"
+                },
+                title: {
+                    display: true,
+                    text: "Compare Statistics - " + data.userStat.name + " VS. " + data.userStat2.name
+                },
+                tooltips: {
+                    mode: 'index',
+                    intersect: false
+                },
+                scales: {
+                    xAxes: [{
+                        stacked: true
+                    }],
+                    yAxes: [{
+                        stacked: true
+                    }]
                 }
             }
         });

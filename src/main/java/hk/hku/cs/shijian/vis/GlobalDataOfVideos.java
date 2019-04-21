@@ -1,6 +1,7 @@
 package hk.hku.cs.shijian.vis;
 
 import hk.hku.cs.shijian.vis.entity.DetailedUser;
+import hk.hku.cs.shijian.vis.entity.UserStat;
 import hk.hku.cs.shijian.vis.entity.UserVideoWithTag;
 import hk.hku.cs.shijian.vis.entity.VideoTag;
 
@@ -108,6 +109,7 @@ public class GlobalDataOfVideos {
         gMid2Aids = mid2Aids;
         gVideoWithTagAll = videoWithTagAll;
         fillDetailedUsers();
+        fillUserStats();
     }//End of loadUserVideoWithTagToGlobalData(String pathVideoWithTag)
 
     private static void fillDetailedUsers() {
@@ -125,4 +127,25 @@ public class GlobalDataOfVideos {
         }
     }
 
+    private static void fillUserStats() {
+        Map<Integer, UserStat> userStats = new HashMap<>();
+
+        for (UserVideoWithTag uvt : gVideoWithTagAll.values()) {
+            int mid = uvt.getMid();
+            if (!userStats.containsKey(mid)) {
+                userStats.put(mid, new UserStat(mid, uvt.getAuthor(), GlobalDataOfUsers.gDetailedUsers.get(mid).getFollower(),0,0,0,0,0,0,0,0));
+            }
+            UserStat us = userStats.get(mid);
+            us.setVideo(us.getVideo() + 1);
+            us.setMinute(us.getMinute() + uvt.getDuration() / 60.0);
+            us.setFav(us.getFav() + uvt.getFavorite());
+            us.setCoin(us.getCoin() + uvt.getCoin());
+            us.setLike(us.getLike() + uvt.getLike());
+            us.setView(us.getView() + uvt.getView());
+            us.setDanmaku(us.getDanmaku() + uvt.getDanmaku());
+            us.setReply(us.getReply() + uvt.getReply());
+        }
+
+        GlobalDataOfUsers.gUserStats = userStats;
+    }
 }

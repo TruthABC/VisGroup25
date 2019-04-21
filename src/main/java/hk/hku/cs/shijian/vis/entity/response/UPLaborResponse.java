@@ -1,5 +1,6 @@
 package hk.hku.cs.shijian.vis.entity.response;
 
+import hk.hku.cs.shijian.vis.entity.UserStat;
 import hk.hku.cs.shijian.vis.entity.UserVideoWithTag;
 
 import java.util.List;
@@ -20,6 +21,10 @@ public class UPLaborResponse extends CommonResponse {
     private List<UserVideoWithTag> userVideos2;
     private List<Integer> monthBinNum2;
     private List<Double> monthBinHot2;
+
+    //Stat for comparing name1 & name2
+    private UserStat userStat;
+    private UserStat userStat2;
 
     public UPLaborResponse() {
         super();
@@ -107,5 +112,21 @@ public class UPLaborResponse extends CommonResponse {
 
     public void setMonthBinHot2(List<Double> monthBinHot2) {
         this.monthBinHot2 = monthBinHot2;
+    }
+
+    public UserStat getUserStat() {
+        return userStat;
+    }
+
+    public void setUserStat(UserStat userStat) {
+        this.userStat = userStat;
+    }
+
+    public UserStat getUserStat2() {
+        return userStat2;
+    }
+
+    public void setUserStat2(UserStat userStat2) {
+        this.userStat2 = userStat2;
     }
 }

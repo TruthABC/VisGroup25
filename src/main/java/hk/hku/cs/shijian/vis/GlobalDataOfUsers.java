@@ -3,6 +3,7 @@ package hk.hku.cs.shijian.vis;
 import hk.hku.cs.shijian.vis.entity.DetailedUser;
 import hk.hku.cs.shijian.vis.entity.RelationOfUser;
 import hk.hku.cs.shijian.vis.entity.SimplifiedUser;
+import hk.hku.cs.shijian.vis.entity.UserStat;
 
 import java.util.*;
 
@@ -11,6 +12,7 @@ public class GlobalDataOfUsers {
     public static Map<Integer, DetailedUser> gDetailedUsers;//mid -> value
     public static Map<String, Integer> gName2Mid;
     public static Map<Integer, RelationOfUser> gRelationsOfUsers;
+    public static Map<Integer, UserStat> gUserStats;
 
     public static void loadUserDataToGlobalData(String pathDetail, String pathTags, String pathFollowings, String pathFriends) {
         // 0. only once init is needed

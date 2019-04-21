@@ -253,6 +253,8 @@ public class UPLaborController {
         res.setUserVideos2(userVideos2);
         res.setMonthBinNum2(monthBinNum2);
         res.setMonthBinHot2(monthBinHot2);
+        res.setUserStat(GlobalDataOfUsers.gUserStats.get(userVideos1.get(0).getMid()));
+        res.setUserStat2(GlobalDataOfUsers.gUserStats.get(userVideos2.get(0).getMid()));
         return res;
     }
 }
