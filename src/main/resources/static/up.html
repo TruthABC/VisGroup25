@@ -613,7 +613,11 @@
             },
             options: {
                 responsive: true,
-                hoverMode: 'index',
+                tooltips: {
+                    position: "average",
+                    mode: "index",
+                    intersect: false
+                },
                 stacked: false,
                 title: {
                     display: true,
@@ -641,12 +645,7 @@
                         // gridLines: {
                         //     drawOnChartArea: false // only want the grid lines for one axis to show up
                         // }
-                    }],
-                    tooltips: {
-                        position: "nearest",
-                        mode: "index",
-                        intersect: false
-                    }
+                    }]
                 }
             }
         });//END new Chart()
