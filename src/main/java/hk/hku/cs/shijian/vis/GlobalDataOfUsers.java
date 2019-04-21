@@ -39,6 +39,7 @@ public class GlobalDataOfUsers {
             detailedUsers.put(du.getMid(), du);
             name2Mid.put(du.getName(), du.getMid());
         }
+        scanner.close();
 
         // 2. Tags loading
         scanner = Global.getFileScanner(pathTags);
@@ -60,6 +61,7 @@ public class GlobalDataOfUsers {
             DetailedUser du = detailedUsers.get(mid);
             du.setTags(tags);
         }
+        scanner.close();
 
         gDetailedUsers = detailedUsers;
         gName2Mid = name2Mid;
@@ -109,6 +111,7 @@ public class GlobalDataOfUsers {
                 relationsOfUsers.put(mid2, rou);
             }
         }
+        scanner.close();
 
         //2. Fill friends
         scanner = Global.getFileScanner(pathFriends);
@@ -125,6 +128,7 @@ public class GlobalDataOfUsers {
             RelationOfUser rou = relationsOfUsers.get(mid1);
             rou.getFriends().add(new SimplifiedUser(mid2, name2));
         }
+        scanner.close();
 
         gRelationsOfUsers = relationsOfUsers;
     }

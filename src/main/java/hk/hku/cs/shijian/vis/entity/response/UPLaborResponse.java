@@ -2,19 +2,24 @@ package hk.hku.cs.shijian.vis.entity.response;
 
 import hk.hku.cs.shijian.vis.entity.UserVideoWithTag;
 
-import java.util.Date;
 import java.util.List;
 
 public class UPLaborResponse extends CommonResponse {
 
     private List<UserVideoWithTag> userVideos;
 
-    private List<Long> monthBins;
+    private List<Long> monthBins; // also for name2
+
     private List<Integer> monthBinNum;
     private List<Double> monthBinMinute;
     private List<Double> monthBinHot;
     private List<Double> monthBinView;
     private List<Double> monthBinReply;
+
+    //for name2
+    private List<UserVideoWithTag> userVideos2;
+    private List<Integer> monthBinNum2;
+    private List<Double> monthBinHot2;
 
     public UPLaborResponse() {
         super();
@@ -78,5 +83,29 @@ public class UPLaborResponse extends CommonResponse {
 
     public void setMonthBinReply(List<Double> monthBinReply) {
         this.monthBinReply = monthBinReply;
+    }
+
+    public List<UserVideoWithTag> getUserVideos2() {
+        return userVideos2;
+    }
+
+    public void setUserVideos2(List<UserVideoWithTag> userVideos2) {
+        this.userVideos2 = userVideos2;
+    }
+
+    public List<Integer> getMonthBinNum2() {
+        return monthBinNum2;
+    }
+
+    public void setMonthBinNum2(List<Integer> monthBinNum2) {
+        this.monthBinNum2 = monthBinNum2;
+    }
+
+    public List<Double> getMonthBinHot2() {
+        return monthBinHot2;
+    }
+
+    public void setMonthBinHot2(List<Double> monthBinHot2) {
+        this.monthBinHot2 = monthBinHot2;
     }
 }

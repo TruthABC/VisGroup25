@@ -24,43 +24,11 @@
                                 <li>
                                     <a href="index.html">Home</a>
                                 </li>
-                                <li class="active">
+                                <li>
                                     <a href="up.html?name=LexBurner">User</a>
                                 </li>
-                                <li>
+                                <li class="active">
                                     <a href="#">Compare</a>
-                                </li>
-                            </ul>
-                            <ul class="nav pull-right">
-                                <li>
-                                    <a href="#">Link3</a>
-                                </li>
-                                <li class="divider-vertical">
-                                </li>
-                                <li class="dropdown">
-                                    <a data-toggle="dropdown" class="dropdown-toggle" href="#">Menu<strong class="caret"></strong></a>
-                                    <ul class="dropdown-menu">
-                                        <li>
-                                            <a href="#">Nav1</a>
-                                        </li>
-                                        <li>
-                                            <a href="#">Nav2</a>
-                                        </li>
-                                        <li>
-                                            <a href="#">other</a>
-                                        </li>
-                                        <li class="divider">
-                                        </li>
-                                        <li class="nav-header">
-                                            label
-                                        </li>
-                                        <li>
-                                            <a href="#">Link1</a>
-                                        </li>
-                                        <li>
-                                            <a href="#">Link2</a>
-                                        </li>
-                                    </ul>
                                 </li>
                             </ul>
                         </div>
@@ -77,36 +45,54 @@
         <div class="span4">
             <dl class="dl-horizontal">
                 <dt>
-                    UP Name (ID)
+                    UP1 (ID)
                 </dt>
-                <dd id="up_name">
+                <dd id="up_name_1">
                     ??? (?)
                 </dd>
                 <dt>
-                    Followers
+
                 </dt>
-                <dd id="up_follower">
-                    100
+                <dd>
+                    VS.
                 </dd>
                 <dt>
-                    Followings
+                    UP2 (ID)
                 </dt>
-                <dd id="up_following">
-                    10
-                </dd>
-                <dt>
-                    Tags
-                </dt>
-                <dd id="up_tags">
-                    (I have no tags.)
+                <dd id="up_name_2">
+                    ??? (?)
                 </dd>
             </dl>
         </div>
         <div class="span4">
-            <img id="avatar" class="img-responsive img-rounded" alt="Avatar" width="200" height="200" />
+            <img id="avatar1" class="img-responsive img-rounded" alt="Avatar" width="200" height="200" />
         </div>
         <div class="span4">
-            <canvas id="video_type_round"></canvas>
+            <img id="avatar2" class="img-responsive img-rounded" alt="Avatar" width="200" height="200" />
+        </div>
+    </div>
+
+    <!--    draw 1-->
+    <div class="row-fluid">
+        <div class="span12">
+            <h3 contenteditable="false">Compare Hotness & Activeness:</h3>
+            <div class="alert alert-info">
+                <button type="button" class="close" data-dismiss="alert">×</button>
+                <h4>
+                    Tips:
+                </h4>
+                <br/>
+                <p>Click on legends to filter in or filter out.</p>
+            </div>
+            <canvas id="labor_bar_line"></canvas>
+        </div>
+    </div>
+
+    <!--    draw 2-->
+    <div class="row-fluid">
+        <div class="span12">
+            <h3 contenteditable="false">Compare Statistics:</h3>
+            <canvas id="compare_stat"></canvas>
         </div>
     </div>
 
@@ -135,6 +121,15 @@
                 'rgb(255, 205, 86)',
                 'rgb(153, 102, 255)',
                 'rgb(201, 203, 207)'
+            ],
+            array_a: [
+                'rgb(255, 99, 132, 0.4)',
+                'rgb(75, 192, 192, 0.4)',
+                'rgb(255, 159, 64, 0.4)',
+                'rgb(54, 162, 235, 0.4)',
+                'rgb(255, 205, 86, 0.4)',
+                'rgb(153, 102, 255, 0.4)',
+                'rgb(201, 203, 207, 0.4)'
             ],
             array_17: [
                 'rgb(228, 26, 28)',
@@ -187,11 +182,111 @@
     });
 
     function onUPBasicGot(data) {
-
+        $("#avatar1").attr("src", data.detailedUser.face);
+        $("#avatar2").attr("src", data.detailedUser2.face);
+        $("#up_name_1").html(data.detailedUser.name + " (" + data.detailedUser.mid + ")");
+        $("#up_name_2").html(data.detailedUser2.name + " (" + data.detailedUser2.mid + ")");
     }
 
     function onUPLaborGot(data) {
+        drawLaborBarAndHotLine(data);
+    }
 
+    //////////////////////////////////////////DRAW line bar/////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////HOT LINE//////////////////////////////////////////////////////////////
+    function drawLaborBarAndHotLine(data) {
+        //data ready
+        var labelx= [];
+        for (var i = 0; i < data.monthBins.length; i++) {
+            var date = new Date(data.monthBins[i]);
+            labelx.push(date.getFullYear() + "-" + (date.getMonth()+1));
+            data.monthBinHot[i] = Math.floor(data.monthBinHot[i]);
+            data.monthBinHot2[i] = Math.floor(data.monthBinHot2[i]);
+        }
+
+        //draw
+        var ctx = document.getElementById('labor_bar_line').getContext('2d');
+        var myMixedChart = new Chart(ctx, {
+            type: "bar",
+            data: {
+                labels: labelx,
+                datasets: [
+                    {
+                        type: "line",
+                        label: "Hotness - " + data.userVideos[0].author,
+                        data: data.monthBinHot,
+                        borderColor: window.chartColors.array[3],
+                        yAxisID: "y-axis-1"
+                    },
+                    {
+                        type: "line",
+                        label: "Hotness - " + data.userVideos2[0].author,
+                        data: data.monthBinHot2,
+                        borderColor: window.chartColors.array[0],
+                        yAxisID: "y-axis-1"
+                    },
+                    {
+                        type: "bar",
+                        label: "Videos - " + data.userVideos[0].author,
+                        data: data.monthBinNum,
+                        backgroundColor: window.chartColors.array_a[1],
+                        yAxisID: "y-axis-2"
+                    },
+                    {
+                        type: "bar",
+                        label: "Videos - " + data.userVideos2[0].author,
+                        data: data.monthBinNum2,
+                        backgroundColor: window.chartColors.array_a[2],
+                        yAxisID: "y-axis-2"
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                title: {
+                    display: true,
+                    text: "Hotness and Activeness - " + data.userVideos[0].author + " VS. " + data.userVideos2[0].author
+                },
+                scales: {
+                    xAxes : [{
+                        display: true,
+                        beginAtZero: false
+                    }],
+                    yAxes: [{
+                        type: "linear",
+                        display: true,
+                        beginAtZero: true,
+                        ticks: {
+                            min: 0
+                        },
+                        position: "left",
+                        id: 'y-axis-1',
+                        scaleLabel: {
+                            display: true,
+                            labelString: "Hotness (complex rating)"
+                        }
+                    },{
+                        type: "linear",
+                        display: true,
+                        beginAtZero: true,
+                        // ticks: {
+                        //     max: 50
+                        // },
+                        position: "right",
+                        id: "y-axis-2",
+                        scaleLabel: {
+                            display: true,
+                            labelString: "Videos"
+                        }
+                    }]
+                },
+                tooltips: {
+                    position: "nearest",
+                    mode: "index",
+                    intersect: false
+                }
+            }
+        });
     }
 </script>
 </html>

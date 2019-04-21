@@ -31,38 +31,6 @@
                                     <a href="compare.html?name=LexBurner&name2=敖厂长">Compare</a>
                                 </li>
                             </ul>
-                            <ul class="nav pull-right">
-                                <li>
-                                    <a href="#">Link3</a>
-                                </li>
-                                <li class="divider-vertical">
-                                </li>
-                                <li class="dropdown">
-                                    <a data-toggle="dropdown" class="dropdown-toggle" href="#">Menu<strong class="caret"></strong></a>
-                                    <ul class="dropdown-menu">
-                                        <li>
-                                            <a href="#">Nav1</a>
-                                        </li>
-                                        <li>
-                                            <a href="#">Nav2</a>
-                                        </li>
-                                        <li>
-                                            <a href="#">other</a>
-                                        </li>
-                                        <li class="divider">
-                                        </li>
-                                        <li class="nav-header">
-                                            label
-                                        </li>
-                                        <li>
-                                            <a href="#">Link1</a>
-                                        </li>
-                                        <li>
-                                            <a href="#">Link2</a>
-                                        </li>
-                                    </ul>
-                                </li>
-                            </ul>
                         </div>
 
                     </div>
@@ -202,6 +170,15 @@
                 'rgb(255, 205, 86)',
                 'rgb(153, 102, 255)',
                 'rgb(201, 203, 207)'
+            ],
+            array_a: [
+                'rgb(255, 99, 132, 0.4)',
+                'rgb(75, 192, 192, 0.4)',
+                'rgb(255, 159, 64, 0.4)',
+                'rgb(54, 162, 235, 0.4)',
+                'rgb(255, 205, 86, 0.4)',
+                'rgb(153, 102, 255, 0.4)',
+                'rgb(201, 203, 207, 0.4)'
             ],
             array_17: [
                 'rgb(228, 26, 28)',
@@ -599,6 +576,7 @@
         for (var i=0; i<data.monthBins.length; i++) {
             var d = new Date(data.monthBins[i]);
             labelx.push(d.getFullYear() + "-" + (d.getMonth()+1));
+            data.monthBinView[i] = Math.floor(data.monthBinView[i] / 1000);
         }
         //draw
         var ctx = document.getElementById('line_view_reply').getContext('2d');
@@ -634,15 +612,23 @@
                         type: 'linear',
                         display: true,
                         position: 'left',
-                        id: 'y-axis-1'
+                        id: 'y-axis-1',
+                        scaleLabel: {
+                            display: true,
+                            labelString: "Views (1,000 *)"
+                        }
                     }, {
                         type: 'linear',
                         display: true,
                         position: 'right',
                         id: 'y-axis-2',
-                        gridLines: {
-                            drawOnChartArea: false // only want the grid lines for one axis to show up
+                        scaleLabel: {
+                            display: true,
+                            labelString: "Replies"
                         }
+                        // gridLines: {
+                        //     drawOnChartArea: false // only want the grid lines for one axis to show up
+                        // }
                     }],
                     tooltips: {
                         position: "nearest",

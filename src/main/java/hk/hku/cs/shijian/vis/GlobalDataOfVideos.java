@@ -103,6 +103,7 @@ public class GlobalDataOfVideos {
                 vt.setAtten(Integer.parseInt(parts[19]));
             }
         }//End of while (scanner.hasNextLine())
+        scanner.close();
 
         gMid2Aids = mid2Aids;
         gVideoWithTagAll = videoWithTagAll;

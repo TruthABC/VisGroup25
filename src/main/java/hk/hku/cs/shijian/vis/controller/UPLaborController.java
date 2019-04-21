@@ -24,7 +24,9 @@ public class UPLaborController {
 
     @RequestMapping("/up_labor")
     @CrossOrigin
-    public CommonResponse getUPLabor(@RequestParam(value="name", defaultValue="") String paramName, HttpServletRequest request) {
+    public CommonResponse getUPLabor(@RequestParam(value="name", defaultValue="") String paramName,
+                                     @RequestParam(value="name2", defaultValue="") String paramName2,
+                                     HttpServletRequest request) {
         //File Mapping Test (relative path || absolute(real) path || system path || net path)
         String absoluteRootPath = request.getRealPath("/");
         absoluteRootPath += "WEB-INF/classes/static/data/";
@@ -43,7 +45,7 @@ public class UPLaborController {
         );
         GlobalDataOfVideos.loadUserVideoWithTagToGlobalData(absoluteRootPath + VIDEOS_WITH_TAG);
 
-        //check null
+        //name check null
         int mid = 0;
         String name = null;
         if (GlobalDataOfUsers.gName2Mid.containsKey(paramName)) {
@@ -63,11 +65,42 @@ public class UPLaborController {
             return new CommonResponse(1, "Cannot find target of param 'name'");
         }
 
+        int mid2 = 0;
+        String name2 = null;
+        if (paramName2 != null && paramName2.length() != 0) {
+            if (GlobalDataOfUsers.gName2Mid.containsKey(paramName2)) {
+                mid2 = GlobalDataOfUsers.gName2Mid.get(paramName2);
+                name2 = paramName2;
+            } else {
+                try {
+                    mid2 = Integer.parseInt(paramName2);
+                    if (GlobalDataOfUsers.gDetailedUsers.containsKey(mid2)){
+                        name2 = GlobalDataOfUsers.gDetailedUsers.get(mid2).getName();
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
         //bins of month
-        List<UserVideoWithTag> userVideos = GlobalDataOfUsers.gDetailedUsers.get(mid).getAllVideos();
-        userVideos.sort(Comparator.comparingLong(UserVideoWithTag::getCreated));
-        UPLaborResponse response = fillUPLaborResponse(userVideos);
-        return response;
+        if (name2 == null) {
+            List<UserVideoWithTag> userVideos = GlobalDataOfUsers.gDetailedUsers.get(mid).getAllVideos();
+            userVideos.sort(Comparator.comparingLong(UserVideoWithTag::getCreated));
+            UPLaborResponse response = fillUPLaborResponse(userVideos);
+            return response;
+        } else {
+            List<UserVideoWithTag> userVideos1 = GlobalDataOfUsers.gDetailedUsers.get(mid).getAllVideos();
+            List<UserVideoWithTag> userVideos2 = GlobalDataOfUsers.gDetailedUsers.get(mid2).getAllVideos();
+            List<UserVideoWithTag> userVideos1_2 = new ArrayList<>();
+            userVideos1_2.addAll(userVideos1);
+            userVideos1_2.addAll(userVideos2);
+            userVideos1.sort(Comparator.comparingLong(UserVideoWithTag::getCreated));
+            userVideos2.sort(Comparator.comparingLong(UserVideoWithTag::getCreated));
+            userVideos1_2.sort(Comparator.comparingLong(UserVideoWithTag::getCreated));
+            UPLaborResponse response = fillUPLaborResponseFor1_2(userVideos1, userVideos2, userVideos1_2);
+            return response;
+        }
     }
 
     private UPLaborResponse fillUPLaborResponse(List<UserVideoWithTag> userVideos) {
@@ -104,7 +137,9 @@ public class UPLaborController {
             } else {//if not same month
                 //while more than 1 month passed
                 //  (Dec -> Jan) or (m -> m+1)
-                while ((created.getYear() > lastCreated.getYear() && created.getMonth() - lastCreated.getMonth() != -11) || created.getMonth() - lastCreated.getMonth() > 1) {
+                while ( (created.getYear() - lastCreated.getYear() > 1) ||
+                        (created.getYear() - lastCreated.getYear() == 1 && created.getMonth() - lastCreated.getMonth() != -11) ||
+                        (created.getMonth() - lastCreated.getMonth() > 1)) {
                     lastCreated.setMonth(lastCreated.getMonth() + 1);
                     monthBins.add(lastCreated.getTime());
                     monthBinNum.add(0);
@@ -130,6 +165,94 @@ public class UPLaborController {
         res.setMonthBinHot(monthBinHot);
         res.setMonthBinView(monthBinView);
         res.setMonthBinReply(monthBinReply);
+        return res;
+    }
+
+    private UPLaborResponse fillUPLaborResponseFor1_2(List<UserVideoWithTag> userVideos1, List<UserVideoWithTag> userVideos2, List<UserVideoWithTag> userVideos1_2) {
+        UPLaborResponse res = new UPLaborResponse(0, "OK");
+        List<Long> monthBins = new ArrayList<>();
+        List<Integer> monthBinNum = new ArrayList<>();
+        List<Double> monthBinHot = new ArrayList<>();
+
+        List<Integer> monthBinNum2 = new ArrayList<>();
+        List<Double> monthBinHot2 = new ArrayList<>();
+
+        //1. make bins for histogram first
+        UserVideoWithTag video0 = userVideos1_2.get(0);
+        Date lastCreated = new Date(video0.getCreated() * 1000);
+        monthBins.add(lastCreated.getTime());
+        for (int i = 1; i < userVideos1_2.size(); i++) {
+            UserVideoWithTag video = userVideos1_2.get(i);
+            Date created = new Date(video.getCreated() * 1000);
+            //if same month
+            if (created.getYear() == lastCreated.getYear() && created.getMonth() == lastCreated.getMonth()) {
+
+            } else {//if not same month
+                //while more than 1 month passed
+                //  (Dec -> Jan) or (m -> m+1)
+                while ( (created.getYear() - lastCreated.getYear() > 1) ||
+                        (created.getYear() - lastCreated.getYear() == 1 && created.getMonth() - lastCreated.getMonth() != -11) ||
+                        (created.getMonth() - lastCreated.getMonth() > 1)) {
+                    lastCreated.setMonth(lastCreated.getMonth() + 1);
+                    monthBins.add(lastCreated.getTime());
+                }
+                monthBins.add(created.getTime());
+            }
+            lastCreated = created;
+        }
+
+        //2. fill name1
+        for (int i = 0; i < monthBins.size(); i++) {
+            monthBinNum.add(0);
+            monthBinHot.add(0.0);
+        }
+        for (int i = 0, j1 = 0; i < monthBins.size() && j1 < userVideos1.size();) {
+            UserVideoWithTag video = userVideos1.get(j1);
+
+            Date nowBinDate = new Date(monthBins.get(i));
+            Date created = new Date(video.getCreated() * 1000);
+
+            //if same month
+            if (created.getYear() == nowBinDate.getYear() && created.getMonth() == nowBinDate.getMonth()) {
+                double hot = video.getFavorite()*0.6 + video.getCoin()*0.3 + video.getLike()*0.1;
+                monthBinNum.set(i, monthBinNum.get(i) + 1);
+                monthBinHot.set(i, monthBinHot.get(i) + hot);
+                j1++;
+            } else {//if not same month
+                i++;
+            }
+        }
+
+        //3. fill name2
+        for (int i = 0; i < monthBins.size(); i++) {
+            monthBinNum2.add(0);
+            monthBinHot2.add(0.0);
+        }
+        for (int i = 0, j1 = 0; i < monthBins.size() && j1 < userVideos2.size();) {
+            UserVideoWithTag video = userVideos2.get(j1);
+
+            Date nowBinDate = new Date(monthBins.get(i));
+            Date created = new Date(video.getCreated() * 1000);
+
+            //if same month
+            if (created.getYear() == nowBinDate.getYear() && created.getMonth() == nowBinDate.getMonth()) {
+                double hot = video.getFavorite()*0.6 + video.getCoin()*0.3 + video.getLike()*0.1;
+                monthBinNum2.set(i, monthBinNum2.get(i) + 1);
+                monthBinHot2.set(i, monthBinHot2.get(i) + hot);
+                j1++;
+            } else {//if not same month
+                i++;
+            }
+        }
+
+        res.setUserVideos(userVideos1);
+        res.setMonthBins(monthBins);
+        res.setMonthBinNum(monthBinNum);
+        res.setMonthBinHot(monthBinHot);
+
+        res.setUserVideos2(userVideos2);
+        res.setMonthBinNum2(monthBinNum2);
+        res.setMonthBinHot2(monthBinHot2);
         return res;
     }
 }
